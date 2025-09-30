@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+* {
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+}
+
+@theme {
+  /* Fonts */
+  --font-title: var(--font-title);
+  --font-text: var(--font-text);
+  /* Colors */
+  --color-background: #dfdfdf;
+  --color-rw-bg: #0f1020;
+  --color-rw-surface: #1a1b3a;
+  --color-rw-surface-2: #242554;
+  --color-rw-text: #f5f6ff;
+  --color-rw-accent: #ff2da8;
+  --color-rw-accent-2: #20f3ff;
+  --color-rw-accent-3: #8a2eff;
+  --color-win98-light: #ffffff;
+  --color-win98-dark: #4d4d4d;
+  --color-win98-shadow: #000000;
+  --color-win98-highlight: #c0c0c0;
+
+  /* Shadows */
+  --shadow-win98: 1px 1px 0 0 #000000, -1px -1px 0 0 #ffffff;
+  --shadow-win98-inset: inset 1px 1px 0 0 #000000, inset -1px -1px 0 0 #ffffff;
+  --shadow-sidebar: inset -1px -1px 0 0 #fff, inset 1px 1px 0 0 grey, inset -2px -2px 0 0 #dfdfdf, inset 2px 2px 0 0 #0a0a0a;
+}
+
+/* Win98-style utilities */
+.font-title { font-family: var(--font-title); }
+.font-text  { font-family: var(--font-text); }
+.win98-button {
+  background-color: var(--color-rw-surface-2);
+  color: var(--color-rw-text);
+  border: 1px solid var(--color-win98-shadow);
+  box-shadow: var(--shadow-win98);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+}
+
+.win98-panel {
+  background-color: var(--color-win98-light);
+  border: 1px solid var(--color-win98-shadow);
+  box-shadow: var(--shadow-win98-inset);
+}
+
+.win98-separator {
+  height: 1px;
+  background-color: var(--color-win98-shadow);
+}
+
+.win98-input {
+  background-color: var(--color-win98-light);
+  color: var(--color-rw-text);
+  border: 1px solid var(--color-win98-shadow);
+  box-shadow: var(--shadow-win98-inset);
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.25rem;
+}
+
+.win95-title {
+  font-family: var(--font-title), "Microsoft Sans Serif", sans-serif;
+  font-weight: bold;
+  font-size: 12px;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+}
+
+.win95-body {
+  font-family: var(--font-text), "Microsoft Sans Serif", sans-serif;
+  font-size: 11px;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+}
+
+.win95-titlebar {
+  background-color: #00008b;
+  display: flex;
+  align-items: center;
+  padding: 2px 6px;
+}
+
+.win95-titlebar-text {
+  color: #ffffff;
+  font-family: var(--font-title), "Microsoft Sans Serif", sans-serif;
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 1px 1px 0 #000000;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+}
