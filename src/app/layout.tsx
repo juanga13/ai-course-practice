@@ -22,7 +22,11 @@ const appFontText = localFont({
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${appFontTitle.variable} ${appFontText.variable}`}>
-      <body className={`h-screen w-screen bg-white text-gray-900 font-text`}>{children}</body>
+      <body className={`h-screen w-screen bg-white text-gray-900 font-text`}>
+        <div className="zoom-container">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }

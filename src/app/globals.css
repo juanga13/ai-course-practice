@@ -12,6 +12,14 @@ html, body {
   box-sizing: border-box;
 }
 
+/* Global zoom container */
+.zoom-container {
+  transform: scale(1.2);
+  transform-origin: top left;
+  width: 83.33%; /* 100% / 1.2 to compensate for scale */
+  height: 83.33%; /* 100% / 1.2 to compensate for scale */
+}
+
 * {
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: grayscale;
@@ -38,7 +46,7 @@ html, body {
   --color-win98-blue: #00008b;
 
   /* Shadows */
-  --shadow-win98: 1px 1px 0 0 #000000, -1px -1px 0 0 #ffffff;
+  --shadow-win98: inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px grey,inset 2px 2px #dfdfdf;
   --shadow-win98-inset: inset 1px 1px 0 0 #000000, inset -1px -1px 0 0 #ffffff;
   --shadow-sidebar: inset -1px -1px 0 0 #fff, inset 1px 1px 0 0 grey, inset -2px -2px 0 0 #dfdfdf, inset 2px 2px 0 0 #0a0a0a;
 }
@@ -111,9 +119,9 @@ html, body {
 }
 
 .win95-shadow {
-  padding: 3px;
-  background: silver;
-  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey, inset 2px 2px #fff;
+  padding: 6px;
+  background: #dfdfdf;
+  box-shadow: inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px grey,inset 2px 2px #dfdfdf;
 }
 
 .win95-shadow-inset {
@@ -130,4 +138,24 @@ html, body {
   position: absolute;
   top: 0;
   width: 12px;
+}
+
+.win95-input {
+  background-color: var(--color-win98-light);
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.25rem;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.win95-button {
+  background-color: var(--color-background);
+  color: var(--color-win98-dark);
+  box-shadow: var(--shadow-win98);
+  padding: 4px 8px;
+}
+
+.win95-button:active {
+  box-shadow: var(--shadow-win98-inset);
 }

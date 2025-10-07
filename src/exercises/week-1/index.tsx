@@ -1,5 +1,6 @@
 import React from "react";
 import { HistorySidebar } from "./HistorySidebar"
+import { Chat } from "./Chat";
 
 export default function Week1() {
   const handleNewChat = () => {
@@ -22,9 +23,7 @@ export default function Week1() {
           }
         }
       ]}/>
-      <div className="flex flex-1 bg-background">
-        <p>asdasd</p>
-      </div>
+      <Chat />
     </div>
   )
 }
