@@ -3,6 +3,13 @@
 html, body {
   height: 100%;
   width: 100%;
+  background-image: url('/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  padding: 8px;
+  box-sizing: border-box;
 }
 
 * {
@@ -28,6 +35,7 @@ html, body {
   --color-win98-dark: #4d4d4d;
   --color-win98-shadow: #000000;
   --color-win98-highlight: #c0c0c0;
+  --color-win98-blue: #00008b;
 
   /* Shadows */
   --shadow-win98: 1px 1px 0 0 #000000, -1px -1px 0 0 #ffffff;
@@ -85,7 +93,7 @@ html, body {
 }
 
 .win95-titlebar {
-  background-color: #00008b;
+  background: linear-gradient(90deg, #00008b 0%, #007dc6 100%);
   display: flex;
   align-items: center;
   padding: 2px 6px;
@@ -95,9 +103,31 @@ html, body {
   color: #ffffff;
   font-family: var(--font-title), "Microsoft Sans Serif", sans-serif;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 16px;
   text-shadow: 1px 1px 0 #000000;
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: grayscale;
   font-smooth: never;
+}
+
+.win95-shadow {
+  padding: 3px;
+  background: silver;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey, inset 2px 2px #fff;
+}
+
+.win95-shadow-inset {
+  padding: 6px;
+  background: white;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+}
+
+.win95-indent::before {
+  border-bottom: 1px dotted grey;
+  content: "";
+  display: block;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 12px;
 }

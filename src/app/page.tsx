@@ -1,15 +1,20 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import Sidebar from "./components/Sidebar";
-import Chat from "./components/Chat";
+import React, { useMemo, useRef, useState } from "react";
 import { HistoryItem } from "./types";
+import { Sidebar } from "@/components/Sidebar";
+import { Tabs } from "@/components/Tabs";
+import Week1 from '@/exercises/week-1'
+import Week2 from '@/exercises/week-2'
+
+export const dynamic = 'force-dynamic';
 
 export default function HomePage() {
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [activeTab, setActiveTab] = useState<string | null>("week-1");
 
   const current = useMemo(
     () => items.find((x) => x.id === currentId) ?? null,
@@ -64,18 +69,22 @@ export default function HomePage() {
   }
 
   return (
-    <div className="h-screen w-screen flex flex-row overflow-hidden">
-      <Sidebar items={items} currentId={currentId} onSelect={setCurrentId} />
-      {/* <main className="p-6 overflow-y-auto">
-        <Chat
-          item={current}
-          isLoading={isLoading}
-          onPickFile={handleFilePick}
-          onFileSelected={onFilesSelected}
-          inputRef={inputRef}
-        />
-      </main> */}
-    </div>
+    <Tabs
+      items={[
+        {
+          active: activeTab === "week-1",
+          content: <Week1/>,
+          name: "NBA Card Classifier",
+          onClick: () => setActiveTab("week-1"),
+        },
+        {
+          active: activeTab === "week-2",
+          content: <Week2/>,
+          name: "RAG-Powered NBA Card Search",
+          onClick: () => setActiveTab("week-2"),
+        },
+      ]}
+    />
   );
 }
 

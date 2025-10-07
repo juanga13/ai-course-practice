@@ -3,9 +3,8 @@ import { generateObject } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { z } from "zod";
 import { getEnv } from "@/env";
-import { cardSchema } from "@/lib/cardSchema";
+import { cardSchema } from "@/utils/cardSchema";
 
-// initialize per-request to ensure env is available at runtime
 function getGoogle() {
   const { GOOGLE_API_KEY } = getEnv();
   return createGoogleGenerativeAI({ apiKey: GOOGLE_API_KEY, });
@@ -20,7 +19,7 @@ const SUPPORTED_TYPES = [
 
 const uploadSchema = z.object({ file: z.instanceof(Blob) });
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 export async function POST(req: NextRequest) {
   try {

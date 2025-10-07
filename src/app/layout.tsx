@@ -8,12 +8,13 @@ import { ReactNode } from "react";
 import localFont from "next/font/local";
 
 const appFontTitle = localFont({
-  src: "../assets/W95FA.otf",
+  src: "../assets/ms_sans_serif_bold.woff2",
   display: "swap",
   variable: "--font-title",
 });
+
 const appFontText = localFont({
-  src: "../assets/micross.ttf",
+  src: "../assets/ms_sans_serif.woff2",
   display: "swap",
   variable: "--font-text",
 });
