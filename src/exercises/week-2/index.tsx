@@ -1,10 +1,10 @@
-
-import React from "react";
+import React from 'react';
+import { SearchInterface } from '@/components/SearchInterface';
 
 export default function Week2() {
   return (
-    <div className="">
-      Week 2
+    <div className="h-full w-full">
+      <SearchInterface />
     </div>
-  )
+  );
 }
