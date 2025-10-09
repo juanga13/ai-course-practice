@@ -18,7 +18,6 @@
     "ai": "^5.0.59",
     "class-variance-authority": "^0.7.1",
     "next": "15.5.4",
-    "openai": "^6.2.0",
     "prettier": "^3.6.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

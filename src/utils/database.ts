@@ -36,5 +36,5 @@ export async function ensureIndexExists(indexName: string, dimension: number) {
 }
 
 export const PINECONE_INDEX_NAME = 'psa-cards-rag';
-export const TEXT_EMBEDDING_DIMENSION = 3072; // OpenAI text-embedding-3-large
+export const TEXT_EMBEDDING_DIMENSION = 768; // Google text-embedding-004
 export const IMAGE_EMBEDDING_DIMENSION = 512; // CLIP ViT-B/32

@@ -1,15 +1,11 @@
-import OpenAI from 'openai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { embed } from 'ai';
 import { getEnv } from '@/env';
 import { CardData } from '@/utils/cardSchema';
 
-let openaiClient: OpenAI | null = null;
-
-export function getOpenAIClient(): OpenAI {
-  if (!openaiClient) {
-    const { OPENAI_API_KEY } = getEnv();
-    openaiClient = new OpenAI({ apiKey: OPENAI_API_KEY });
-  }
-  return openaiClient;
+function getGoogle() {
+  const { GOOGLE_API_KEY } = getEnv();
+  return createGoogleGenerativeAI({ apiKey: GOOGLE_API_KEY });
 }
 
 export function createTextContent(cardData: CardData): string {
@@ -33,16 +29,15 @@ export function createTextContent(cardData: CardData): string {
 }
 
 export async function generateTextEmbedding(text: string): Promise<number[]> {
-  const openai = getOpenAIClient();
+  const google = getGoogle();
 
   try {
-    const response = await openai.embeddings.create({
-      model: 'text-embedding-3-large',
-      input: text,
-      encoding_format: 'float',
+    const { embedding } = await embed({
+      model: google.textEmbeddingModel('text-embedding-004'),
+      value: text,
     });
 
-    return response.data[0].embedding;
+    return embedding;
   } catch (error) {
     console.error('Error generating text embedding:', error);
     throw new Error('Failed to generate text embedding');

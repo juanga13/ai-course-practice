@@ -1,92 +1,62 @@
 'use client';
 
 import React, { useState } from 'react';
-// import { HistoryItem } from './types';
-// import { Sidebar } from "@/components/Sidebar";
-import { Tabs } from '@/components/Tabs';
-import Week1 from '@/exercises/week-1';
-import Week2 from '@/exercises/week-2';
+import { Title } from '../components/Text';
+import { cn } from '../utils/cn';
+import { HistorySidebar } from '../components/HistorySidebar';
+import { Chat } from '../components/Chat';
 
 export const dynamic = 'force-dynamic';
 
 export default function HomePage() {
-  // const [items, setItems] = useState<HistoryItem[]>([]);
-  // const [currentId, setCurrentId] = useState<string | null>(null);
-  // const [, setIsLoading] = useState(false);
-  // const inputRef = useRef<HTMLInputElement | null>(null);
-  const [activeTab, setActiveTab] = useState<string | null>('week-1');
+  const [newChat, setNewChat] = useState(false);
+  const [activeChat, setActiveChat] = useState<string | null>(null);
 
-  // const _current = useMemo(
-  //   () => items.find(x => x.id === currentId) ?? null,
-  //   [items, currentId]
-  // );
+  const handleNewChat = () => {
+    setActiveChat(null);
+    setNewChat(true);
+  };
 
-  // function _handleFilePick() {
-  //   inputRef.current?.click();
-  // }
-
-  // async function _onFilesSelected(file: File | null) {
-  //   if (!file) return;
-  //   const id = crypto.randomUUID();
-  //   const url = URL.createObjectURL(file);
-  //   const item: HistoryItem = { id, name: file.name, url, result: null };
-  //   setItems(prev => [item, ...prev]);
-  //   setCurrentId(id);
-  //   setIsLoading(true);
-
-  //   try {
-  //     const form = new FormData();
-  //     form.append('file', file);
-  //     const res = await fetch('/api/analyze', { method: 'POST', body: form });
-  //     const data = await res.json();
-
-  //     setItems(prev =>
-  //       prev.map(it =>
-  //         it.id === id
-  //           ? {
-  //               ...it,
-  //               result: res.ok ? data : null,
-  //               error: res.ok ? null : data,
-  //             }
-  //           : it
-  //       )
-  //     );
-  //   } catch (e: unknown) {
-  //     setItems(prev =>
-  //       prev.map(it =>
-  //         it.id === id
-  //           ? {
-  //               ...it,
-  //               result: null,
-  //               error: {
-  //                 error: 'image_not_supported',
-  //                 reason: e instanceof Error ? e.message : 'Network error',
-  //               },
-  //             }
-  //           : it
-  //       )
-  //     );
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
+  const handleSelectChat = (chat: string) => {
+    setActiveChat(chat);
+    setNewChat(false);
+  };
 
   return (
-    <Tabs
-      items={[
-        {
-          active: activeTab === 'week-1',
-          content: <Week1 />,
-          name: 'NBA Card Classifier',
-          onClick: () => setActiveTab('week-1'),
-        },
-        {
-          active: activeTab === 'week-2',
-          content: <Week2 />,
-          name: 'RAG Card Search',
-          onClick: () => setActiveTab('week-2'),
-        },
-      ]}
-    />
+    <div className="h-full w-full flex flex-col overflow-hidden win95-shadow">
+      <div className="w-full flex flex-0 win95-titlebar gap-2">
+        <div
+          className={cn(
+            'flex flex-row items-center gap-2',
+            'win95-titlebar-text border border-transparent border-dotted',
+            'select-none'
+          )}
+        >
+          <Title>
+            {`NBA Card Classifier` +
+              (newChat ? `/new-chat` : activeChat ? `/${activeChat}` : '')}
+          </Title>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-row">
+        <HistorySidebar
+          onNewChat={handleNewChat}
+          chats={[
+            {
+              name: 'Chat 1',
+              isActive: activeChat === 'chat-1',
+              onSelect: () => handleSelectChat('chat-1'),
+            },
+            {
+              name: 'Chat 2',
+              isActive: activeChat === 'chat-2',
+              onSelect: () => handleSelectChat('chat-2'),
+            },
+          ]}
+        />
+        <Chat />
+      </div>
+    </div>
   );
 }
