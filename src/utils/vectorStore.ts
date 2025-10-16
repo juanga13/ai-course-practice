@@ -14,16 +14,9 @@ export async function storeCardInVectorDB(
   _imageEmbedding: number[]
 ): Promise<string> {
   const pinecone = getPineconeClient();
-
-  // Ensure the index exists
   await ensureIndexExists(PINECONE_INDEX_NAME, TEXT_EMBEDDING_DIMENSION);
-
   const index = pinecone.index(PINECONE_INDEX_NAME);
-
-  // Generate a unique ID for the card
   const cardId = `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-  // Prepare metadata for the vector
   const metadata = {
     cardId,
     playerName: cardData.playerName,
@@ -40,8 +33,6 @@ export async function storeCardInVectorDB(
     imageUrl,
     createdAt: new Date().toISOString(),
   };
-
-  // Store text embedding
   await index.upsert([
     {
       id: `${cardId}_text`,
@@ -52,10 +43,6 @@ export async function storeCardInVectorDB(
       },
     },
   ]);
-
-  // Store image embedding (we'll need a separate index for this or use a different approach)
-  // For now, we'll store both in the same index with different IDs
-
   return cardId;
 }
 
@@ -72,34 +59,27 @@ export async function searchSimilarCards(
   const index = pinecone.index(PINECONE_INDEX_NAME);
 
   try {
-    // Perform text similarity search
     const textResults = await index.query({
       vector: textEmbedding,
       topK: limit * 2, // Get more results to merge
       includeMetadata: true,
-      filter: filters,
+      filter: filters || {},
     });
-
-    // Perform image similarity search (if we have image embeddings)
     let imageResults: any = { matches: [] };
     if (imageEmbedding && imageEmbedding.length > 0) {
       imageResults = await index.query({
         vector: imageEmbedding,
         topK: limit * 2,
         includeMetadata: true,
-        filter: filters,
+        filter: filters || {},
       });
     }
-
-    // Merge and score results
     const resultMap = new Map<string, SearchResult>();
 
-    // Process text results
     textResults.matches?.forEach(match => {
       if (match.metadata && match.id.endsWith('_text')) {
         const cardId = match.id.replace('_text', '');
         const score = match.score || 0;
-
         resultMap.set(cardId, {
           id: cardId,
           cardData: {
@@ -128,7 +108,6 @@ export async function searchSimilarCards(
       }
     });
 
-    // Process image results and update scores
     imageResults.matches?.forEach((match: any) => {
       if (match.metadata && match.id.endsWith('_image')) {
         const cardId = match.id.replace('_image', '');
@@ -140,7 +119,6 @@ export async function searchSimilarCards(
           existing.combinedScore =
             existing.textScore * textWeight + score * imageWeight;
         } else {
-          // Add new result from image search only
           resultMap.set(cardId, {
             id: cardId,
             cardData: {
@@ -170,7 +148,6 @@ export async function searchSimilarCards(
       }
     });
 
-    // Sort by combined score and return top results
     return Array.from(resultMap.values())
       .sort((a, b) => b.combinedScore - a.combinedScore)
       .slice(0, limit);

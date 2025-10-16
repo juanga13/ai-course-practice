@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic';
 export default function HomePage() {
   const [newChat, setNewChat] = useState(false);
   const [activeChat, setActiveChat] = useState<string | null>(null);
+  const [chats] = useState<string[]>([]);
 
   const handleNewChat = () => {
     setActiveChat(null);
@@ -23,7 +24,14 @@ export default function HomePage() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden win95-shadow">
+    // <div>
+    //   <div className="flex-0 w-full h-[60px] bg-blue-200"></div>
+    //   <div className="flex flex-1 flex-row">
+    //     <div className="w-[200px] bg-red-200 h-full" />
+    //     <div className="flex-1 bg-green-200 h-full" />
+    //   </div>
+    // </div>
+    <div className="flex flex-1 flex-col win95-shadow h-full min-h-0">
       <div className="w-full flex flex-0 win95-titlebar gap-2">
         <div
           className={cn(
@@ -39,23 +47,16 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-row">
+      <div className="flex flex-1 flex-row min-h-0">
         <HistorySidebar
           onNewChat={handleNewChat}
-          chats={[
-            {
-              name: 'Chat 1',
-              isActive: activeChat === 'chat-1',
-              onSelect: () => handleSelectChat('chat-1'),
-            },
-            {
-              name: 'Chat 2',
-              isActive: activeChat === 'chat-2',
-              onSelect: () => handleSelectChat('chat-2'),
-            },
-          ]}
+          chats={chats.map(chat => ({
+            name: chat,
+            isActive: activeChat === chat,
+            onSelect: () => handleSelectChat(chat),
+          }))}
         />
-        <Chat />
+        <Chat activeChat={activeChat} />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateObject } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-// import { z } from 'zod';
+import { put } from '@vercel/blob';
 import { getEnv } from '@/env';
 import { cardSchema } from '@/utils/cardSchema';
 import { generateTextEmbeddingFromCard } from '@/utils/embeddings';
@@ -20,16 +20,14 @@ const SUPPORTED_TYPES = [
   'application/pdf',
 ];
 
-// const uploadSchema = z.object({ file: z.instanceof(Blob) });
-
-// export const runtime = "edge";
-
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get('file');
+    console.log('[Image analyze] file', file);
 
     if (!(file instanceof Blob)) {
+      console.log('[Image analyze] file not a blob');
       return NextResponse.json(
         { error: 'image_not_supported', reason: 'No file provided' },
         { status: 400 }
@@ -37,6 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!SUPPORTED_TYPES.includes(file.type)) {
+      console.log('[Image analyze] file not supported', file.type);
       return NextResponse.json(
         {
           error: 'image_not_supported',
@@ -49,8 +48,18 @@ export async function POST(req: NextRequest) {
     const bytes = new Uint8Array(await file.arrayBuffer());
     const isImage = file.type.startsWith('image/');
 
-    const systemPrompt =
-      'You extract structured data from an NBA PSA certified trading card image. Return as JSON per schema. If not a PSA graded NBA card, explain why.';
+    const systemPrompt = `
+Instructions:
+- You extract structured data from an NBA PSA certified trading card image.
+- Return as JSON per schema.
+- If not a PSA graded NBA card, explain why.
+`;
+
+    console.log('[Image analyze] Google generate object', {
+      type: file.type,
+      isImage,
+      systemPrompt,
+    });
 
     const google = getGoogle();
     const { object } = await generateObject({
@@ -70,8 +79,10 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    // Basic plausibility check: require playerName non-empty
-    if (!object.playerName) {
+    console.log('[Image analyze] Google generate object OK?', object);
+
+    if (!object.playerName || object.playerName === 'N/A') {
+      console.log('[Image analyze] Google generate OK? NO, missing playerName');
       return NextResponse.json(
         {
           error: 'image_not_supported',
@@ -82,20 +93,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate embeddings and store in vector database
+    console.log('[Image analyze] Google generate OK? YES');
+
     try {
+      const fileName = `cards/${object.playerName.replace(/\s+/g, '-')}-${Date.now()}.${file.type.split('/')[1]}`;
+      const blob = await put(fileName, file, {
+        access: 'public',
+        addRandomSuffix: true,
+      });
+
+      console.log(
+        '[Image analyze] Blob generated, uploaded to Vercel Blob Storage and generating embeddings (text and image)'
+      );
+
       const [textEmbedding, imageEmbedding] = await Promise.all([
         generateTextEmbeddingFromCard(object),
-        generateImageEmbedding(bytes),
+        generateImageEmbedding(blob.url),
       ]);
 
-      // Create a temporary image URL (in a real app, you'd store the image and get a permanent URL)
-      const imageUrl = `data:${file.type};base64,${Buffer.from(bytes).toString('base64')}`;
-
-      // Store in vector database
       const cardId = await storeCardInVectorDB(
         object,
-        imageUrl,
+        blob.url,
         textEmbedding,
         imageEmbedding
       );
@@ -103,6 +121,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         ...object,
         cardId,
+        imageUrl: blob.url,
         stored: true,
       });
     } catch (embeddingError) {
@@ -110,7 +129,6 @@ export async function POST(req: NextRequest) {
         'Error generating embeddings or storing in vector DB:',
         embeddingError
       );
-      // Return the card data even if embedding generation fails
       return NextResponse.json({
         ...object,
         stored: false,

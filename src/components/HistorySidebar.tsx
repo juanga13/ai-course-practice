@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import Image from 'next/image';
 import { Text, Title } from '@/components/Text';
 import dialogIcon from '@/assets/Dialog.ico';
@@ -14,13 +14,20 @@ interface HistorySidebarProps {
 }
 
 export const HistorySidebar = (props: HistorySidebarProps) => {
+  const [newChat, setNewChat] = useState(false);
+
+  const handleNewChat = () => {
+    setNewChat(true);
+    props.onNewChat();
+  };
+
   return (
-    <div className="h-full w-[300px] p-2 bg-background">
+    <div className="flex flex-0 min-w-[220px] p-2 bg-background">
       <div className="h-full w-full bg-white win95-shadow-inset">
         <ClickableText
-          isActive={false}
+          isActive={newChat}
           isLast={false}
-          onClick={props.onNewChat}
+          onClick={handleNewChat}
         >
           <Image src={dialogIcon} alt="Dialog" width={16} height={16} />
           <Text>New Chat</Text>

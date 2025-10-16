@@ -19,7 +19,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
 
-    // Generate embeddings for the query
     const [textEmbedding, clipTextEmbedding] = await Promise.all([
       generateTextEmbedding(query),
       generateTextEmbeddingForCLIP(query),
@@ -72,7 +71,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Build filters from query parameters
     const filters: Record<string, unknown> = {};
     const playerName = searchParams.get('playerName');
     const team = searchParams.get('team');
@@ -86,13 +84,11 @@ export async function GET(req: NextRequest) {
     if (manufacturer) filters.manufacturer = { $eq: manufacturer };
     if (grade) filters.grade = { $eq: grade };
 
-    // Generate embeddings for the query
     const [textEmbedding, clipTextEmbedding] = await Promise.all([
       generateTextEmbedding(query),
       generateTextEmbeddingForCLIP(query),
     ]);
 
-    // Perform hybrid search
     const results = await searchSimilarCards(
       query,
       textEmbedding,

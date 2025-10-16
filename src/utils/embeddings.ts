@@ -25,6 +25,7 @@ export function createTextContent(cardData: CardData): string {
     .filter(Boolean)
     .join(' | ');
 
+  console.log('[Text embedding] createTextContent:', content);
   return content;
 }
 
@@ -36,10 +37,10 @@ export async function generateTextEmbedding(text: string): Promise<number[]> {
       model: google.textEmbeddingModel('text-embedding-004'),
       value: text,
     });
-
+    console.log('[Text embedding] Generated!', embedding);
     return embedding;
   } catch (error) {
-    console.error('Error generating text embedding:', error);
+    console.error('[Text embedding] Error generating:', error);
     throw new Error('Failed to generate text embedding');
   }
 }
@@ -47,6 +48,13 @@ export async function generateTextEmbedding(text: string): Promise<number[]> {
 export async function generateTextEmbeddingFromCard(
   cardData: CardData
 ): Promise<number[]> {
+  console.log(
+    '[Text embedding] Generating text embedding from card data',
+    cardData
+  );
   const textContent = createTextContent(cardData);
-  return generateTextEmbedding(textContent);
+  console.log('[Text embedding] Text content', textContent);
+  const result = await generateTextEmbedding(textContent);
+  console.log('[Text embedding] Result', result);
+  return result;
 }

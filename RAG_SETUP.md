@@ -18,6 +18,7 @@ GOOGLE_API_KEY=your_google_api_key_here
 # New variables for RAG system
 PINECONE_API_KEY=your_pinecone_api_key_here
 PINECONE_ENVIRONMENT=your_pinecone_environment_here
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_xxxxxxxxxxxxx
 ```
 
 ## Setup Steps
@@ -29,9 +30,18 @@ PINECONE_ENVIRONMENT=your_pinecone_environment_here
 3. Get your API key and environment from the Pinecone console
 4. Add these to your `.env.local` file
 
-### 2. Test the System
+### 2. Vercel Blob Storage Setup
 
-1. Start your development server: `npm run dev`
+1. Go to your project in [Vercel Dashboard](https://vercel.com/dashboard)
+2. Navigate to **Storage** tab → **Create Database** → **Blob**
+3. Copy the `BLOB_READ_WRITE_TOKEN` from Settings → Environment Variables
+4. Add it to your `.env.local` file
+
+**Note**: See `VERCEL_BLOB_SETUP.md` for detailed instructions.
+
+### 3. Test the System
+
+1. Start your development server: `pnpm dev`
 2. Go to the "NBA Card Classifier" tab
 3. Upload a PSA card image to test the classification and embedding generation
 4. Switch to the "RAG Card Search" tab
@@ -44,6 +54,7 @@ PINECONE_ENVIRONMENT=your_pinecone_environment_here
 - Upload PSA card images
 - Automatic extraction of card metadata
 - Generation of text and image embeddings
+- **Permanent image storage** in Vercel Blob (CDN-backed)
 - Storage in Pinecone vector database
 
 ### Hybrid Search

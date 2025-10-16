@@ -1,46 +1,36 @@
-import { pipeline } from '@xenova/transformers';
+import { FeatureExtractionPipeline, pipeline } from '@xenova/transformers';
 
-let clipPipeline: any = null;
+let clipPipeline: FeatureExtractionPipeline | null = null;
 
-export async function getCLIPPipeline(): Promise<any> {
+export async function getCLIPPipeline(): Promise<FeatureExtractionPipeline> {
   if (!clipPipeline) {
     clipPipeline = await pipeline(
-      'image-to-text',
-      'Xenova/clip-vit-base-patch32'
+      'feature-extraction',
+      'Xenova/all-MiniLM-L6-v2',
+      { quantized: true }
     );
   }
   return clipPipeline;
 }
 
 export async function generateImageEmbedding(
-  imageData: Uint8Array
+  image: string | string[]
 ): Promise<number[]> {
   try {
     const pipeline = await getCLIPPipeline();
 
-    // Convert Uint8Array to a format that CLIP can process
-    // For transformers.js, we need to create a proper image object
-    const blob = new Blob([imageData as BlobPart], { type: 'image/jpeg' });
-    const imageUrl = URL.createObjectURL(blob);
+    console.log('[CLIP] Feature extraction pipeline', pipeline);
+    const result = await pipeline(image, {
+      pooling: 'mean',
+      normalize: true,
+    });
 
-    // Use the pipeline to process the image
-    const result = await pipeline(imageUrl);
-
-    // Clean up the object URL
-    URL.revokeObjectURL(imageUrl);
-
-    // Extract embeddings from the result
-    // Note: This is a simplified approach - you might need to adjust based on actual CLIP output
-    if (result && result.embeddings) {
-      return Array.from(result.embeddings);
-    }
-
-    // Fallback: return a dummy embedding if the structure is different
-    return new Array(512).fill(0).map(() => Math.random() - 0.5);
+    const resultArray = Array.from(result.data);
+    console.log('[CLIP] Result', resultArray);
+    return resultArray;
   } catch (error) {
-    console.error('Error generating image embedding:', error);
-    // Return a dummy embedding as fallback
-    return new Array(512).fill(0).map(() => Math.random() - 0.5);
+    console.error('[CLIP] Error generating image embedding:', error);
+    throw new Error('Failed to generate image embedding');
   }
 }
 
@@ -49,19 +39,18 @@ export async function generateTextEmbeddingForCLIP(
 ): Promise<number[]> {
   try {
     const pipeline = await getCLIPPipeline();
+    console.log('[CLIP] Feature extraction pipeline', pipeline);
 
-    // Generate embedding for text query
-    const result = await pipeline(text);
+    const result = await pipeline(text, {
+      pooling: 'mean',
+      normalize: true,
+    });
 
-    if (result && result.embeddings) {
-      return Array.from(result.embeddings);
-    }
-
-    // Fallback: return a dummy embedding
-    return new Array(512).fill(0).map(() => Math.random() - 0.5);
+    const resultArray = Array.from(result.data);
+    console.log('[CLIP] Result', resultArray);
+    return resultArray;
   } catch (error) {
     console.error('Error generating CLIP text embedding:', error);
-    // Return a dummy embedding as fallback
-    return new Array(512).fill(0).map(() => Math.random() - 0.5);
+    throw new Error('Failed to generate CLIP text embedding');
   }
 }

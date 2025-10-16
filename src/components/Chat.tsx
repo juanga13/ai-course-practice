@@ -1,11 +1,7 @@
 import { Text } from '@/components/Text';
 import { Button } from '@/components/Button';
 import { useState, useCallback } from 'react';
-
-// interface Message {
-//   role: 'user' | 'ai';
-//   content: string;
-// }
+import Image from 'next/image';
 
 interface ClassificationResult {
   cardNumber: string;
@@ -25,10 +21,13 @@ interface ClassificationResult {
   year: string;
 }
 
-export const Chat = () => {
+export const Chat = ({
+  activeChat: _activeChat,
+}: {
+  activeChat: string | null;
+}) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<File | null>(null);
   const [isClassifying, setIsClassifying] = useState<boolean>(false);
   const [classificationResult, setClassificationResult] =
     useState<ClassificationResult | null>(null);
@@ -51,13 +50,8 @@ export const Chat = () => {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      setUploadedFile(file);
       if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          setImagePreview(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
+        setImagePreview(file);
       } else {
         setImagePreview(null);
       }
@@ -67,13 +61,9 @@ export const Chat = () => {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setUploadedFile(file);
+      console.log('file', file, file.type.startsWith('image/'));
       if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          setImagePreview(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
+        setImagePreview(file);
       } else {
         setImagePreview(null);
       }
@@ -81,7 +71,7 @@ export const Chat = () => {
   };
 
   const handleClassifyImage = async () => {
-    if (!uploadedFile) return;
+    if (!imagePreview) return;
 
     setIsClassifying(true);
     setError(null);
@@ -89,7 +79,7 @@ export const Chat = () => {
 
     try {
       const formData = new FormData();
-      formData.append('file', uploadedFile);
+      formData.append('file', imagePreview);
 
       const response = await fetch('/api/analyze', {
         method: 'POST',
@@ -113,27 +103,19 @@ export const Chat = () => {
 
   const renderContent = () => {
     if (isClassifying) {
-      return (
-        <div className="bg-white win95-shadow-inset h-full flex items-center justify-center">
-          <Text className="text-gray-600">Loading...</Text>
-        </div>
-      );
+      return <Text className="text-gray-600">Classifying...</Text>;
     }
 
     if (error) {
-      return (
-        <div className="bg-white win95-shadow-inset h-full flex items-center justify-center">
-          <Text className="text-red-600 text-center">{error}</Text>
-        </div>
-      );
+      return <Text className="text-red-600 text-center">{error}</Text>;
     }
 
     if (classificationResult) {
       return (
-        <div className="bg-white win95-shadow-inset h-full overflow-y-auto">
+        <>
           <div className="p-4 space-y-3">
             <div className="border-b pb-2">
-              <Text className="text-lg font-bold">
+              <Text className="text-lg font-bold mr-2">
                 {classificationResult.playerName}
               </Text>
               <Text className="text-sm text-gray-600">
@@ -143,7 +125,7 @@ export const Chat = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Text className="font-semibold">Card Details:</Text>
+                <Text className="font-semibold mr-2">Card Details:</Text>
                 <Text>Manufacturer: {classificationResult.manufacturer}</Text>
                 <Text>Set: {classificationResult.setName}</Text>
                 <Text>Type: {classificationResult.parallelOrVariant}</Text>
@@ -151,7 +133,7 @@ export const Chat = () => {
               </div>
 
               <div>
-                <Text className="font-semibold">PSA Grade:</Text>
+                <Text className="font-semibold mr-2">PSA Grade:</Text>
                 <Text>
                   Grade: {classificationResult.psa.grade}
                   {classificationResult.psa.qualifier}
@@ -163,7 +145,7 @@ export const Chat = () => {
 
             {classificationResult.notes && (
               <div>
-                <Text className="font-semibold">Notes:</Text>
+                <Text className="font-semibold mr-2">Notes:</Text>
                 <Text>{classificationResult.notes}</Text>
               </div>
             )}
@@ -179,41 +161,40 @@ export const Chat = () => {
               </ul>
             </div>
           </div>
-        </div>
+        </>
       );
     }
 
     return (
-      <div className="bg-white win95-shadow-inset h-full flex items-center justify-center">
-        <Text className="text-gray-600">Waiting for upload...</Text>
-      </div>
+      <Text className="text-gray-600">
+        {imagePreview
+          ? 'Please upload an image to classify'
+          : 'Please upload an image to classify'}
+      </Text>
     );
   };
 
   return (
-    <div className="flex flex-1 flex-col bg-background p-2 gap-2 h-full overflow-hidden">
-      <div className="flex-1 min-h-0">{renderContent()}</div>
+    <div className="flex flex-1 flex-col bg-background p-2 gap-2 h-full">
+      <div className="flex flex-1 flex-col w-full overflow-auto win95-shadow-inset">
+        {renderContent()}
+      </div>
 
       {imagePreview && (
-        <div className="bg-white win95-shadow-inset p-4 flex flex-shrink-0 flex-col gap-2">
-          <Button
-            onClick={handleClassifyImage}
-            disabled={isClassifying}
-            className="self-start"
-          >
-            {isClassifying ? 'Classifying...' : 'Send'}
-          </Button>
+        <div className="bg-white win95-shadow-inset p-4 flex flex-0 flex-shrink-0 flex-col gap-2">
           <div className="flex justify-center">
-            <img
-              src={imagePreview}
+            <Image
+              width={35}
+              height={70}
+              src={URL.createObjectURL(imagePreview)}
               alt="Preview"
-              className="max-h-[200px] w-auto"
+              className="h-[70px] w-auto"
             />
           </div>
         </div>
       )}
 
-      <div className="flex flex-row bg-white win95-shadow-inset flex-shrink-0 h-12">
+      <div className="flex flex-0 flex-row bg-white win95-shadow-inset flex-shrink-0 h-12 gap-2">
         <div
           className={`flex-1 flex items-start justify-start p-2 transition-colors ${
             dragActive ? 'bg-blue-100' : 'bg-gray-50'
@@ -231,12 +212,21 @@ export const Chat = () => {
             accept="*/*"
           />
           <Text className="text-gray-500">
-            {uploadedFile ? uploadedFile.name : 'Drag & drop a file here'}
+            {imagePreview ? imagePreview.name : 'Drag & drop a file here'}
           </Text>
         </div>
         <Button onClick={() => document.getElementById('file-input')?.click()}>
           Upload
         </Button>
+        {imagePreview && (
+          <Button
+            onClick={handleClassifyImage}
+            // disabled={isClassifying}
+            // className="self-start"
+          >
+            Classify
+          </Button>
+        )}
       </div>
     </div>
   );

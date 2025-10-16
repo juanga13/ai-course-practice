@@ -30,7 +30,6 @@ export async function ensureIndexExists(indexName: string, dimension: number) {
       },
     });
 
-    // Wait for index to be ready
     await new Promise(resolve => setTimeout(resolve, 10000));
   }
 }
